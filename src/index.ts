@@ -26,19 +26,15 @@ export async function papitron(req: Request, res: Response) {
     : { executablePath: require('chrome-finder')() };
   const browser = await puppeteer.launch(config);
   const page = await browser.newPage();
-  await page.setViewport({
-    width: 960,
-    height: 760,
-    deviceScaleFactor: 1,
-  });
   await page.setContent(content);
-  const screenshot = await page.screenshot({ type: 'png' });
+  const screenshot = await page.screenshot({ fullPage: true, type: 'png' });
 
   res.end(screenshot, 'binary');
 }
 
 if (!isProd) {
+  // tslint:disable-next-line:no-var-requires
   const devServer = require('./dev-server').default;
   devServer.all('/', papitron);
-  devServer.listen(9001);
+  devServer.listen(8080);
 }
