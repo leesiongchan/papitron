@@ -1,0 +1,13 @@
+{
+  "folders": [
+    {
+      "path": "/Users/leesiongchan/Projects/papitron"
+    }
+  ],
+  "settings": {
+    "files.exclude": {
+      "**/dist": false,
+      "**/node_modules": true
+    }
+  }
+}
