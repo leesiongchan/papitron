@@ -1,3 +1,4 @@
+import Jimp from 'jimp';
 import chrome from 'chrome-aws-lambda';
 import puppeteer from 'puppeteer-core';
 import { Request, Response } from 'express';
@@ -27,9 +28,15 @@ export async function papitron(req: Request, res: Response) {
   const browser = await puppeteer.launch(config);
   const page = await browser.newPage();
   await page.setContent(content);
-  const screenshot = await page.screenshot({ fullPage: true, type: 'png' });
-
-  res.end(screenshot, 'binary');
+  const screenshot = await page.screenshot({ fullPage: true });
+  const jimpImage = await Jimp.read(screenshot);
+  jimpImage.autocrop({}, async (err: any, jimpInstance: Jimp) => {
+    if (err) {
+      throw err;
+    } else {
+      res.end(await jimpInstance.getBufferAsync(Jimp.MIME_PNG), 'binary');
+    }
+  });
 }
 
 if (!isProd) {
