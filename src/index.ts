@@ -5,6 +5,8 @@ import { Request, Response } from 'express';
 
 const isProd = process.env.NODE_ENV === 'production';
 
+let browser: puppeteer.Browser;
+
 export async function papitron(req: Request, res: Response) {
   if (req.method !== 'POST') {
     res.status(405).end();
@@ -18,18 +20,22 @@ export async function papitron(req: Request, res: Response) {
     return;
   }
 
-  const config = isProd
-    ? {
-        args: chrome.args,
-        executablePath: await chrome.executablePath,
-        headless: chrome.headless,
-      }
-    : { executablePath: require('chrome-finder')() };
-  const browser = await puppeteer.launch(config);
+  if (!browser) {
+    const config = isProd
+      ? {
+          args: chrome.args,
+          executablePath: await chrome.executablePath,
+          headless: chrome.headless,
+        }
+      : { executablePath: require('chrome-finder')() };
+    browser = await puppeteer.launch(config);
+  }
+
   const page = await browser.newPage();
   await page.setContent(content);
   const screenshot = await page.screenshot({ fullPage: true });
   const jimpImage = await Jimp.read(screenshot);
+  // Clean up useless white background
   jimpImage.autocrop({}, async (err: any, jimpInstance: Jimp) => {
     if (err) {
       throw err;
