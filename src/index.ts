@@ -46,13 +46,8 @@ export async function papitron(req: Request, res: Response) {
       data = await generatePdf(page);
       break;
 
-    case 'jpg':
-    case 'jpeg':
-    case 'png':
-      data = await generateImage(page, acceptType);
-      break;
-
     default:
+      data = await generateImage(page, acceptType);
       break;
   }
 
