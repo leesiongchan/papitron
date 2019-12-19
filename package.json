@@ -22,22 +22,22 @@
     "gcp-build": "yarn build"
   },
   "dependencies": {
-    "chrome-aws-lambda": "^1.19.0",
-    "iltorb": "^2.4.3",
-    "jimp": "^0.8.2",
-    "puppeteer-core": "^1.19.0"
+    "chrome-aws-lambda": "^2.0.1",
+    "iltorb": "^2.4.4",
+    "jimp": "^0.9.3",
+    "puppeteer-core": "^2.0.0"
   },
   "devDependencies": {
-    "@types/express": "^4.17.1",
-    "@types/puppeteer-core": "^1.9.0",
+    "@types/express": "^4.17.2",
+    "@types/puppeteer-core": "^2.0.0",
     "body-parser": "^1.19.0",
-    "chrome-finder": "^1.0.5",
+    "chrome-finder": "^1.0.6",
     "express": "^4.17.1",
-    "puppeteer": "^1.19.0",
-    "ts-node-dev": "^1.0.0-pre.42",
+    "puppeteer": "^2.0.0",
+    "ts-node-dev": "^1.0.0-pre.44",
     "tslib": "^1.10.0",
-    "tslint": "^5.20.0",
+    "tslint": "^5.20.1",
     "tslint-config-prettier": "^1.18.0",
-    "typescript": "^3.6.3"
+    "typescript": "^3.7.3"
   }
 }

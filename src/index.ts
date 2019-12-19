@@ -14,9 +14,15 @@ export async function papitron(req: Request, res: Response) {
   }
 
   const content = req.body;
+  const acceptType = req.headers.accept;
 
   if (!content) {
-    res.status(400).end('Body content is required');
+    res.status(400).end('`Body` content is required');
+    return;
+  }
+
+  if (!acceptType) {
+    res.status(400).end('`Accept` header is required');
     return;
   }
 
@@ -32,17 +38,51 @@ export async function papitron(req: Request, res: Response) {
   }
 
   const page = await browser.newPage();
-  await page.setContent(content);
-  const screenshot = await page.screenshot({ fullPage: true });
-  const jimpImage = await Jimp.read(screenshot);
-  // Clean up useless white background
-  jimpImage.autocrop({}, async (err: any, jimpInstance: Jimp) => {
-    if (err) {
-      throw err;
-    } else {
-      res.end(await jimpInstance.getBufferAsync(Jimp.MIME_PNG), 'binary');
-    }
+  await page.setContent(content, { waitUntil: 'networkidle0' });
+  let data: Buffer | undefined;
+
+  switch (acceptType) {
+    case 'application/pdf':
+      data = await generatePdf(page);
+      break;
+
+    case 'jpg':
+    case 'jpeg':
+    case 'png':
+      data = await generateImage(page, acceptType);
+      break;
+
+    default:
+      break;
+  }
+
+  res.setHeader('Content-Type', acceptType);
+  res.end(data, 'binary');
+}
+
+// Helper functions
+
+async function generateImage(page: puppeteer.Page, type: string) {
+  const data = await page.screenshot({
+    fullPage: true,
   });
+  const jimpImage = await Jimp.read(data);
+  // Clean up useless white background
+  return new Promise<Buffer>((resolve, reject) => {
+    jimpImage.autocrop({}, async (err: any, jimpInstance: Jimp) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(await jimpInstance.getBufferAsync(type));
+      }
+    });
+  });
+}
+
+async function generatePdf(page: puppeteer.Page) {
+  await page.emulateMedia('screen');
+  const data = await page.pdf({ format: 'A4' });
+  return data;
 }
 
 if (!isProd) {
